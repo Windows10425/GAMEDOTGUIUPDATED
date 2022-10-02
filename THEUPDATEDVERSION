@@ -1,0 +1,706 @@
+local Library = loadstring(game:HttpGet("https://raw.githubusercontent.com/xHeptc/Kavo-UI-Library/main/source.lua"))()
+local Window = Library.CreateLib("TESTING", "DarkTheme")
+
+
+-- MAIN
+local Main = Window:NewTab("Main")
+local MainSection = Main:NewSection("Testing Tab")
+
+
+MainSection:NewButton("DOORS 1", "Probably useful(?)", function()
+    loadstring(game:HttpGet("https://raw.githubusercontent.com/RegularVynixu/Vynixius/main/Doors/Script.lua"))()
+end)
+
+MainSection:NewButton("DOORS 2", "Ripoff", function()
+    local OrionLib = loadstring(game:HttpGet(('https://raw.githubusercontent.com/shlexware/Orion/main/source')))()
+local Window = OrionLib:MakeWindow({IntroText = "Doors GUI v1.2",Name = "Doors", HidePremium = false, SaveConfig = true, ConfigFolder = "DoorsSex"})
+if game.PlaceId == 6516141723 then
+    OrionLib:MakeNotification({
+        Name = "Error",
+        Content = "Please execute when in game, not in lobby.",
+        Time = 2
+    })
+end
+local VisualsTab = Window:MakeTab({
+	Name = "Visuals",
+	Icon = "rbxassetid://4483345998",
+	PremiumOnly = false
+})
+local CF = CFrame.new
+local LatestRoom = game:GetService("ReplicatedStorage").GameData.LatestRoom
+local ChaseStart = game:GetService("ReplicatedStorage").GameData.ChaseStart
+
+local KeyChams = {}
+VisualsTab:AddToggle({
+	Name = "Key Chams",
+	Default = false,
+    Flag = "KeyToggle",
+    Save = true,
+	Callback = function(Value)
+		for i,v in pairs(KeyChams) do
+            v.Enabled = Value
+        end
+	end    
+})
+
+local function ApplyKeyChams(inst)
+    wait()
+    local Cham = Instance.new("Highlight")
+    Cham.DepthMode = Enum.HighlightDepthMode.AlwaysOnTop
+    Cham.FillColor = Color3.new(0.980392, 0.670588, 0)
+    Cham.FillTransparency = 0.5
+    Cham.OutlineColor = Color3.new(0.792156, 0.792156, 0.792156)
+    Cham.Parent = game:GetService("CoreGui")
+    Cham.Adornee = inst
+    Cham.Enabled = OrionLib.Flags["KeyToggle"].Value
+    Cham.RobloxLocked = true
+    return Cham
+end
+
+local KeyCoroutine = coroutine.create(function()
+    workspace.CurrentRooms.DescendantAdded:Connect(function(inst)
+        if inst.Name == "KeyObtain" then
+            table.insert(KeyChams,ApplyKeyChams(inst))
+        end
+    end)
+end)
+for i,v in ipairs(workspace:GetDescendants()) do
+    if v.Name == "KeyObtain" then
+        table.insert(KeyChams,ApplyKeyChams(v))
+    end
+end
+coroutine.resume(KeyCoroutine)
+
+local BookChams = {}
+VisualsTab:AddToggle({
+	Name = "Book Chams",
+	Default = false,
+    Flag = "BookToggle",
+    Save = true,
+	Callback = function(Value)
+		for i,v in pairs(BookChams) do
+            v.Enabled = Value
+        end
+	end    
+})
+
+local FigureChams = {}
+VisualsTab:AddToggle({
+	Name = "Figure Chams",
+	Default = false,
+    Flag = "FigureToggle",
+    Save = true,
+    Callback = function(Value)
+        for i,v in pairs(FigureChams) do
+            v.Enabled = Value
+        end
+    end
+})
+
+local function ApplyBookChams(inst)
+    if inst:IsDescendantOf(game:GetService("Workspace").CurrentRooms:FindFirstChild("50")) and game:GetService("ReplicatedStorage").GameData.LatestRoom.Value == 50 then
+        wait()
+        local Cham = Instance.new("Highlight")
+        Cham.DepthMode = Enum.HighlightDepthMode.AlwaysOnTop
+        Cham.FillColor = Color3.new(0, 1, 0.749019)
+        Cham.FillTransparency = 0.5
+        Cham.OutlineColor = Color3.new(0.792156, 0.792156, 0.792156)
+        Cham.Parent = game:GetService("CoreGui")
+        Cham.Enabled = OrionLib.Flags["BookToggle"].Value
+        Cham.Adornee = inst
+        Cham.RobloxLocked = true
+        return Cham
+    end
+end
+
+local function ApplyEntityChams(inst)
+    wait()
+    local Cham = Instance.new("Highlight")
+    Cham.DepthMode = Enum.HighlightDepthMode.AlwaysOnTop
+    Cham.FillColor = Color3.new(1, 0, 0)
+    Cham.FillTransparency = 0.5
+    Cham.OutlineColor = Color3.new(0.792156, 0.792156, 0.792156)
+    Cham.Parent = game:GetService("CoreGui")
+    Cham.Enabled = OrionLib.Flags["FigureToggle"].Value
+    Cham.Adornee = inst
+    Cham.RobloxLocked = true
+    return Cham
+end
+
+local BookCoroutine = coroutine.create(function()
+    task.wait(1)
+    for i,v in pairs(game:GetService("Workspace").CurrentRooms["50"].Assets:GetDescendants()) do
+        if v.Name == "LiveHintBook" then
+            table.insert(BookChams,ApplyBookChams(v))
+        end
+    end
+end)
+local EntityCoroutine = coroutine.create(function()
+    local Entity = game:GetService("Workspace").CurrentRooms["50"].FigureSetup:WaitForChild("FigureRagdoll",5)
+    Entity:WaitForChild("Torso",2.5)
+    table.insert(FigureChams,ApplyEntityChams(Entity))
+end)
+
+
+local GameTab = Window:MakeTab({
+	Name = "Game",
+	Icon = "rbxassetid://4483345998",
+	PremiumOnly = false
+})
+local CharTab = Window:MakeTab({
+	Name = "Character",
+	Icon = "rbxassetid://4483345998",
+	PremiumOnly = false
+})
+
+local TargetWalkspeed
+CharTab:AddSlider({
+	Name = "Speed",
+	Min = 0,
+	Max = 50,
+	Default = 5,
+	Color = Color3.fromRGB(255,255,255),
+	Increment = 1,
+	Callback = function(Value)
+		TargetWalkspeed = Value
+	end    
+})
+
+local pcl = Instance.new("SpotLight")
+pcl.Brightness = 1
+pcl.Face = Enum.NormalId.Front
+pcl.Range = 90
+pcl.Parent = game.Players.LocalPlayer.Character.Head
+pcl.Enabled = false
+
+
+CharTab:AddToggle({
+	Name = "Headlight",
+	Default = false,
+    Callback = function(Value)
+        pcl.Enabled = Value
+    end
+})
+
+GameTab:AddToggle({
+	Name = "No seek arms/obstructions",
+	Default = false,
+    Flag = "NoSeek",
+    Save = true
+})
+
+GameTab:AddToggle({
+	Name = "Instant Interact",
+	Default = false,
+    Flag = "InstantToggle",
+    Save = true
+})
+GameTab:AddButton({
+	Name = "Skip level",
+	Callback = function()
+        pcall(function()
+            local HasKey = false
+            local CurrentDoor = workspace.CurrentRooms[tostring(game:GetService("ReplicatedStorage").GameData.LatestRoom.Value)]:WaitForChild("Door")
+            for i,v in ipairs(CurrentDoor.Parent:GetDescendants()) do
+                if v.Name == "KeyObtain" then
+                    HasKey = v
+                end
+            end
+            if HasKey then
+                game.Players.LocalPlayer.Character:PivotTo(CF(HasKey.Hitbox.Position))
+                wait(0.3)
+                fireproximityprompt(HasKey.ModulePrompt,0)
+                game.Players.LocalPlayer.Character:PivotTo(CF(CurrentDoor.Door.Position))
+                wait(0.3)
+                fireproximityprompt(CurrentDoor.Lock.UnlockPrompt,0)
+            end
+            if LatestRoom == 50 then
+                CurrentDoor = workspace.CurrentRooms[tostring(LatestRoom+1)]:WaitForChild("Door")
+            end
+            game.Players.LocalPlayer.Character:PivotTo(CF(CurrentDoor.Door.Position))
+            wait(0.3)
+            CurrentDoor.ClientOpen:FireServer()
+        end)
+  	end    
+})
+
+GameTab:AddToggle({
+	Name = "Auto skip level",
+	Default = false,
+    Save = false,
+    Flag = "AutoSkip"
+})
+
+local AutoSkipCoro = coroutine.create(function()
+        while true do
+            task.wait()
+            pcall(function()
+            if OrionLib.Flags["AutoSkip"].Value == true and game:GetService("ReplicatedStorage").GameData.LatestRoom.Value < 100 then
+                local HasKey = false
+                local LatestRoom = game:GetService("ReplicatedStorage").GameData.LatestRoom.Value
+                local CurrentDoor = workspace.CurrentRooms[tostring(LatestRoom)]:WaitForChild("Door")
+                for i,v in ipairs(CurrentDoor.Parent:GetDescendants()) do
+                    if v.Name == "KeyObtain" then
+                        HasKey = v
+                    end
+                end
+                if HasKey then
+                    game.Players.LocalPlayer.Character:PivotTo(CF(HasKey.Hitbox.Position))
+                    task.wait(0.3)
+                    fireproximityprompt(HasKey.ModulePrompt,0)
+                    game.Players.LocalPlayer.Character:PivotTo(CF(CurrentDoor.Door.Position))
+                    task.wait(0.3)
+                    fireproximityprompt(CurrentDoor.Lock.UnlockPrompt,0)
+                end
+                if LatestRoom == 50 then
+                    CurrentDoor = workspace.CurrentRooms[tostring(LatestRoom+1)]:WaitForChild("Door")
+                end
+                game.Players.LocalPlayer.Character:PivotTo(CF(CurrentDoor.Door.Position))
+                task.wait(0.3)
+                CurrentDoor.ClientOpen:FireServer()
+            end
+        end)
+        end
+end)
+coroutine.resume(AutoSkipCoro)
+
+GameTab:AddButton({
+	Name = "No jumpscares",
+	Callback = function()
+        pcall(function()
+            game:GetService("ReplicatedStorage").Bricks.Jumpscare:Destroy()
+        end)
+  	end    
+})
+GameTab:AddToggle({
+	Name = "Avoid Rush/Ambush",
+	Default = false,
+    Flag = "AvoidRushToggle",
+    Save = true
+})
+GameTab:AddToggle({
+	Name = "No Screech",
+	Default = false,
+    Flag = "ScreechToggle",
+    Save = true
+})
+
+GameTab:AddToggle({
+	Name = "Always win heartbeat",
+	Default = false,
+    Flag = "HeartbeatWin",
+    Save = true
+})
+
+GameTab:AddToggle({
+	Name = "Predict chases",
+	Default = false,
+    Flag = "PredictToggle" ,
+    Save = true
+})
+GameTab:AddToggle({
+	Name = "Notify when mob spawns",
+	Default = false,
+    Flag = "MobToggle" ,
+    Save = true
+})
+GameTab:AddButton({
+	Name = "Complete breaker box minigame",
+	Callback = function()
+        game:GetService("ReplicatedStorage").Bricks.EBF:FireServer()
+  	end    
+})
+GameTab:AddButton({
+	Name = "Skip level 50",
+	Callback = function()
+        local CurrentDoor = workspace.CurrentRooms[tostring(LatestRoom+1)]:WaitForChild("Door")
+        game.Players.LocalPlayer.Character:PivotTo(CF(CurrentDoor.Door.Position))
+  	end    
+})
+GameTab:AddParagraph("Warning","You may need to open/close the panel a few times for this to work, fixing soon.")
+
+--// ok actual code starts here
+
+game:GetService("RunService").RenderStepped:Connect(function()
+    pcall(function()
+        if game.Players.LocalPlayer.Character.Humanoid.MoveDirection.Magnitude > 0 then
+            game.Players.LocalPlayer.Character:TranslateBy(game.Players.LocalPlayer.Character.Humanoid.MoveDirection * TargetWalkspeed/50)
+        end
+    end)
+end)
+
+game:GetService("Workspace").CurrentRooms.DescendantAdded:Connect(function(descendant)
+    if OrionLib.Flags["NoSeek"].Value == true and descendant.Name == ("Seek_Arm" or "ChandelierObstruction") then
+        task.spawn(function()
+            wait()
+            descendant:Destroy()
+        end)
+    end
+end)
+
+game:GetService("ProximityPromptService").PromptButtonHoldBegan:Connect(function(prompt)
+    if OrionLib.Flags["InstantToggle"].Value == true then
+        fireproximityprompt(prompt)
+    end
+end)
+
+local old
+old = hookmetamethod(game,"__namecall",newcclosure(function(self,...)
+    local args = {...}
+    local method = getnamecallmethod()
+    
+    if tostring(self) == 'Screech' and method == "FireServer" and OrionLib.Flags["ScreechToggle"].Value == true then
+        args[1] = true
+        return old(self,unpack(args))
+    end
+    if tostring(self) == 'ClutchHeartbeat' and method == "FireServer" and OrionLib.Flags["HeartbeatWin"].Value == true then
+        args[2] = true
+        return old(self,unpack(args))
+    end
+    
+    return old(self,...)
+end))
+
+workspace.CurrentCamera.ChildAdded:Connect(function(child)
+    if child.Name == "Screech" and OrionLib.Flags["ScreechToggle"].Value == true then
+        child:Destroy()
+    end
+end)
+
+local NotificationCoroutine = coroutine.create(function()
+    LatestRoom.Changed:Connect(function()
+        if OrionLib.Flags["PredictToggle"].Value == true then
+            local n = ChaseStart.Value - LatestRoom.Value
+            if 0 < n and n < 4 then
+                OrionLib:MakeNotification({
+                    Name = "Warning!",
+                    Content = "Event in " .. tostring(n) .. " rooms.",
+                    Time = 5
+                })
+            end
+        end
+        if OrionLib.Flags["BookToggle"].Value == true then
+            if LatestRoom.Value == 50 then
+                coroutine.resume(BookCoroutine)
+            end
+        end
+        if OrionLib.Flags["FigureToggle"].Value == true then
+            if LatestRoom.Value == 50 then
+                coroutine.resume(EntityCoroutine)
+            end
+        end
+    end)
+    workspace.ChildAdded:Connect(function(inst)
+        if inst.Name == "RushMoving" and OrionLib.Flags["MobToggle"].Value == true then
+            if OrionLib.Flags["AvoidRushToggle"].Value == true then
+                OrionLib:MakeNotification({
+                    Name = "Warning!",
+                    Content = "Avoiding Rush. Please wait.",
+                    Time = 5
+                })
+                local OldPos = game.Players.LocalPlayer.Character.HumanoidRootPart.Position
+                local con = game:GetService("RunService").Heartbeat:Connect(function()
+                    game.Players.LocalPlayer.Character:MoveTo(OldPos + Vector3.new(0,20,0))
+                end)
+                
+                inst.Destroying:Wait()
+                con:Disconnect()
+
+                game.Players.LocalPlayer.Character:MoveTo(OldPos)
+            else
+                OrionLib:MakeNotification({
+                    Name = "Warning!",
+                    Content = "Rush has spawned, hide!",
+                    Time = 5
+                })
+            end
+        elseif inst.Name == "AmbushMoving" and OrionLib.Flags["MobToggle"].Value == true then
+            if OrionLib.Flags["AvoidRushToggle"].Value == true then
+                OrionLib:MakeNotification({
+                    Name = "Warning!",
+                    Content = "Avoiding Ambush. Please wait.",
+                    Time = 5
+                })
+                local OldPos = game.Players.LocalPlayer.Character.HumanoidRootPart.Position
+                local con = game:GetService("RunService").Heartbeat:Connect(function()
+                    game.Players.LocalPlayer.Character:MoveTo(OldPos + Vector3.new(0,20,0))
+                end)
+                
+                inst.Destroying:Wait()
+                con:Disconnect()
+                
+                game.Players.LocalPlayer.Character:MoveTo(OldPos)
+            else
+                OrionLib:MakeNotification({
+                    Name = "Warning!",
+                    Content = "Ambush has spawned, hide!",
+                    Time = 5
+                })
+            end
+        end
+    end)
+end)
+
+--// ok actual code ends here
+
+local CreditsTab = Window:MakeTab({
+	Name = "Credits",
+	Icon = "rbxassetid://4483345998",
+	PremiumOnly = false
+})
+
+CreditsTab:AddParagraph("Credits to","OminousVibes - (Got most of the ideas from their thread, check it out! - https://v3rmillion.net/showthread.php?tid=1184088)")
+
+coroutine.resume(NotificationCoroutine)
+
+OrionLib:Init()
+
+task.wait(2)
+end)
+
+MainSection:NewButton("DOORS 3", "Another Rip-Off...", function()
+    local a=game:GetService'Players'local b=game:GetService'Workspace'local c=game:
+GetService'ContentProvider'local d=game:GetService'CoreGui'do local e e=
+hookfunction(c.PreloadAsync,function(f,g,h)if table.find(g,d)then local i=
+function(i,j)if i:match'^rbxasset://'or i:match'^rbxthumb://'then return h(i,j)
+end end warn'Anticheat Check Detected'return e(f,g,i)end return e(f,g,h)end)end
+local e=[[https://raw.githubusercontent.com/wally-rblx/LinoriaLib/main/]]local f
+=loadstring(game:HttpGet(e..'Library.lua'))()local g=loadstring(game:HttpGet(e..
+'addons/SaveManager.lua'))()local h=loadstring(game:HttpGet(e..
+'addons/ThemeManager.lua'))()local i=syn and syn.protect_gui or function(i)end
+local j=a.LocalPlayer local k={['Beat']=true,['Creak']=true,['Door']=true,[
+'Doorknob']=true,['Ghost']=true,['Window Knock']=true}local l=10 local m={}local
+n={}local o={}local p=function(p)if p then local q=p:FindFirstChild
+'HumanoidRootPart'if q then local r=p:FindFirstChild'Humanoid'return r~=nil end
+end return false end local q do q={}q.__index=q function q.new(r)local s=
+setmetatable({instance=r,destructed=false},q)s.instance.AncestryChanged:Connect(
+function(t,u)if u==nil then s:destroy()end end)return s:constructor(r)end
+function q.constructor(r,s)r.cham=Instance.new'BoxHandleAdornment'task.defer(r.
+onStart,r)return r end function q.onStart(r)local s=r.instance local t=s:
+WaitForChild('FigureRagdoll',2.5)local u=t:WaitForChild('Root',2.5)local v=r.
+cham n[v]=true v.Visible=Toggles.FIGURE_CHAMS.Value v.Color3=Color3.new(1,0,0)v.
+Transparency=0.25 v.Size=Vector3.new(2,5,2)v.AlwaysOnTop=true v.ZIndex=5 v.
+Adornee=u v.RobloxLocked=true v.Parent=u end function q.destroy(r)if r.
+destructed then return else r.destructed=true end r.cham:Destroy()n[r.cham]=nil
+end end local r do r={}r.__index=r function r.new(s)local t=setmetatable({
+instance=s,destructed=false},r)t.instance.AncestryChanged:Connect(function(u,v)
+if v==nil then t:destroy()end end)return t:constructor(s)end function r.
+constructor(s,t)s.cham=Instance.new'BoxHandleAdornment'task.defer(s.onStart,s)
+return s end function r.onStart(s)local t=s.instance local u=s.cham o[u]=true u.
+Visible=Toggles.INTERACT_CHAMS.Value u.Color3=Color3.new(1,1,1)u.Transparency=
+0.5 u.Size=t.Size+Vector3.new(0.1,0.1,0.1)u.AlwaysOnTop=true u.ZIndex=5 u.
+Adornee=t u.RobloxLocked=true u.Parent=d end function r.destroy(s)if s.
+destructed then return else s.destructed=true end s.cham:Destroy()o[s.cham]=nil
+end end local s do s={}s.__index=s function s.new(t)local u=setmetatable({
+instance=t,destructed=false},s)u.instance.AncestryChanged:Connect(function(v,w)
+if w==nil then u:destroy()end end)return u:constructor(t)end function s.
+constructor(t,u)task.defer(t.onStart,t)return t end function s.onStart(t)local u
+=t.instance repeat if u.Name=='50'then t:onRoom50()break end if u.Name=='100'
+then t:onRoom100()break end until true end function s.onRoom50(t)local u=t.
+instance local v=u:WaitForChild('FigureSetup',2.5)local w=q.new(v)local x=
+function(x)if x.Name=='Super Cool Bookshelf With Hint Book'then local y=x:
+WaitForChild('LiveHintBook',2.5)if y then local z=y:WaitForChild('Base',2.5)if z
+then r.new(z)end end end end for y,z in ipairs(u.Assets:GetChildren())do task.
+defer(x,z)end u.Assets.ChildAdded:Connect(x)end function s.onRoom100(t)local u=t
+.instance local v=u:WaitForChild('FigureSetup',2.5)local w=q.new(v)end function
+s.destroy(t)if t.destructed then return else t.destructed=true end end end local
+t=function(t)local u=s.new(t)end local u=function(u)while not p(u)do u.
+DescendantAdded:Wait()end l=u.Humanoid.WalkSpeed u.Humanoid.WalkSpeed=u.Humanoid
+.WalkSpeed+Options.WALKSPEED.Value end local v=function(v)if v:IsA'Attachment'
+then if Toggles.REMOVE_AMBIENCE.Value then local w for x=1,10 do w=v:
+FindFirstChildWhichIsA'Sound'if w then break end task.wait()end if w then if k[w
+.Name]then w.Volume=0 print(w.Name)end end end end end local w=function(w)if w.
+Name=='RushMoving'then if Toggles.EVENT_NOTIFIER.Value then f:Notify
+'[Event Notifier]: Rush spawned, hide quickly!'end end end f:SetWatermark
+'Linoria Community (OminousVibes)'f:Notify'Loading UI...'do local x=f:
+CreateWindow'Doors'do local y=x:AddTab'Gameplay'do local z=y:AddLeftTabbox
+'Modifications'local A=z:AddTab'Character Mods'A:AddSlider('WALKSPEED',{Text=
+'Speed Boost',Min=0,Max=10,Default=0,Rounding=1,Suffix=''})A:AddToggle(
+'GLOW_ENABLED',{Text='Body Glow',Default=false,Tooltip=
+'Adds a subtle glow for better vision'})local B=z:AddTab'World Mods'B:AddToggle(
+'REMOVE_AMBIENCE',{Text='Remove Ambience',Default=false,Tooltip=
+'Removes the unnecessary sounds from the world'})end do local z=y:
+AddRightGroupbox'Notifiers'z:AddToggle('EVENT_NOTIFIER',{Text='Event Notifier',
+Default=true,Tooltip='Notifies you when certain events occur'})end end do local
+y=x:AddTab'Visuals'do local z=y:AddLeftTabbox'Visuals'local A=z:AddTab'Entities'
+A:AddToggle('FIGURE_CHAMS',{Text='Figure Chams',Default=true,Tooltip=
+'Figure ESP'})local B=z:AddTab'Objects'B:AddToggle('INTERACT_CHAMS',{Text=
+'Interactable Chams',Default=true,Tooltip='ESP for items that can be picked up'}
+)end do local z=y:AddRightGroupbox'World Render'end end do local y=x:AddTab
+'Settings'h:SetLibrary(f)g:SetLibrary(f)h:SetFolder'OminousVibes'g:SetFolder
+'OminousVibes/doors'g:IgnoreThemeSettings()g:SetIgnoreIndexes{'MenuKeybind'}g:
+BuildConfigSection(y)h:ApplyToTab(y)local z=y:AddLeftGroupbox'Menu'z:AddButton(
+'Unload',function()f:Unload()end)z:AddLabel'Menu bind':AddKeyPicker(
+'MenuKeybind',{Default='End',NoUI=true,Text='Menu keybind'})z:AddToggle(
+'Keybinds',{Text='Show Keybinds Menu',Default=true}):OnChanged(function()f.
+KeybindFrame.Visible=Toggles.Keybinds.Value end)z:AddToggle('Watermark',{Text=
+'Show Watermark',Default=true}):OnChanged(function()f:SetWatermarkVisibility(
+Toggles.Watermark.Value)end)end end f:Notify'UI Loaded'j.CharacterAdded:Connect(
+u)b.ChildAdded:Connect(w)b.Terrain.ChildAdded:Connect(v)b.CurrentRooms.
+ChildAdded:Connect(t)do do Options.WALKSPEED:OnChanged(function(x)local y=j.
+Character if p(y)then y.Humanoid.WalkSpeed=l+Options.WALKSPEED.Value end end)
+Toggles.GLOW_ENABLED:OnChanged(function()for x,y in ipairs(m)do y:Destroy()end
+if Toggles.GLOW_ENABLED.Value then local z=Instance.new'PointLight'local A=
+Instance.new'SurfaceLight'z.Brightness=0.75 A.Brightness=0.25 z.Range=20 A.Range
+=90 m={z,A}i(z)i(A)z.Parent=j.Character.HumanoidRootPart A.Parent=j.Character.
+Head else m={}end end)end do Toggles.FIGURE_CHAMS:OnChanged(function()for x,y in
+pairs(n)do x.Visible=Toggles.FIGURE_CHAMS.Value end end)Toggles.INTERACT_CHAMS:
+OnChanged(function()for x,y in ipairs(o)do y.Visible=Toggles.INTERACT_CHAMS.
+Value end end)end end do local x local y local z=typeof local A,B=Vector3.new,
+math.random local C=game.IsA x=hookmetamethod(game,'__index',function(D,E)if not
+checkcaller()then if z(D)=='Instance'then if C(D,'Humanoid')then if E==
+'WalkSpeed'then return l end end end end return x(D,E)end)y=hookmetamethod(game,
+'__newindex',function(D,E,F)if not checkcaller()then if z(D)=='Instance'then if
+C(D,'Humanoid')then if E=='WalkSpeed'then l=F return y(D,E,F+Options.WALKSPEED.
+Value)end end end end return y(D,E,F)end)end do local x=j.Character if x then u(
+x)end end do for x,y in ipairs(b.CurrentRooms:GetChildren())do task.defer(t,y)
+end end return f:Notify'[Doors] Loaded!'
+end)
+
+
+MainSection:NewButton("HOURS", "Killaura and Godmode", function()
+    loadstring(game:HttpGet("https://pastebin.com/raw/jDqD8h8J"))()
+end)
+
+
+MainSection:NewButton("Funky Friday", "This is OP", function()
+    loadstring(game:HttpGet("https://raw.githubusercontent.com/wally-rblx/funky-friday-autoplay/main/main.lua",true))()
+end)
+
+MainSection:NewButton("Notoriety", "Also OP", function()
+    loadstring(game:HttpGet('https://raw.githubusercontent.com/Sinscrips/roblox-scripts/main/Notoriety.lua', true))()
+end)
+
+MainSection:NewButton("Infinite Yield", "Most OPest (If you know what to do)", function()
+    loadstring(game:HttpGet('https://raw.githubusercontent.com/EdgeIY/infiniteyield/master/source'))()
+end)
+
+MainSection:NewButton("Decaying Winter", "Totally good", function()
+    loadstring(game:HttpGet(('https://raw.githubusercontent.com/Aidez/decaying_winter/main/GOODWILL_COMMAND_SCRIPT'),true))()
+end)
+
+MainSection:NewButton("Da Hood", "EY EY EY KID MIC UP (lol)", function()
+    loadstring(game:HttpGet('https://ekso.gq/raw/relases/zapped.lua'))()
+end)
+
+MainSection:NewButton("MM2", "Murder Mistari 2", function()
+    loadstring(game:HttpGet("https://raw.githubusercontent.com/Doggo-cryto/EclipseMM2/master/Script", true))()
+end)
+
+MainSection:NewButton("YBA", "DO NOT ABUSE (pls)", function()
+    loadstring(game:HttpGet("https://raw.githubusercontent.com/UltraStuff/scripts2/main/yba", true))()
+end)
+
+MainSection:NewButton("Break In", "Who would actually use this?", function()
+    local ScreenGui = Instance.new("ScreenGui") ----- enjoy it!
+local main = Instance.new("Frame")
+local BreakIn = Instance.new("TextLabel")
+local opGui = Instance.new("TextButton")
+local police = Instance.new("TextButton")
+local Throw = Instance.new("TextButton")
+local Close = Instance.new("TextButton")
+local OpenButton = Instance.new("TextButton")
+
+--Properties:
+
+ScreenGui.Parent = game.Players.LocalPlayer:WaitForChild("PlayerGui")
+ScreenGui.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
+
+main.Name = "main"
+main.Parent = ScreenGui
+main.BackgroundColor3 = Color3.fromRGB(30, 30, 30)
+main.Position = UDim2.new(0.444747597, 0, 0.350253791, 0)
+main.Size = UDim2.new(0, 136, 0, 165)
+main.Visible = false
+main.Draggable = true
+
+BreakIn.Name = "BreakIn"
+BreakIn.Parent = main
+BreakIn.BackgroundColor3 = Color3.fromRGB(65, 65, 65)
+BreakIn.Position = UDim2.new(-0.235294119, 0, -0.0545454547, 0)
+BreakIn.Size = UDim2.new(0, 200, 0, 33)
+BreakIn.Font = Enum.Font.SourceSans
+BreakIn.Text = "Break In (Story)"
+BreakIn.TextColor3 = Color3.fromRGB(112, 112, 112)
+BreakIn.TextSize = 14.000
+
+opGui.Name = "opGui"
+opGui.Parent = main
+opGui.BackgroundColor3 = Color3.fromRGB(65, 65, 65)
+opGui.Position = UDim2.new(0.213235289, 0, 0.25454545, 0)
+opGui.Size = UDim2.new(0, 77, 0, 17)
+opGui.Font = Enum.Font.SourceSans
+opGui.Text = "OpGui"
+opGui.TextColor3 = Color3.fromRGB(113, 113, 113)
+opGui.TextSize = 14.000
+opGui.MouseButton1Down:connect(function()
+	loadstring(game:HttpGet("https://pastebin.com/raw/Wg8pEW3Z", true))()
+end)
+
+police.Name = "police"
+police.Parent = main
+police.BackgroundColor3 = Color3.fromRGB(65, 65, 65)
+police.Position = UDim2.new(0.161764711, 0, 0.454545468, 0)
+police.Size = UDim2.new(0, 93, 0, 15)
+police.Font = Enum.Font.SourceSans
+police.Text = "Police (in spawn)"
+police.TextColor3 = Color3.fromRGB(0, 0, 0)
+police.TextSize = 14.000
+police.MouseButton1Down:connect(function()
+	local A_1 = "Gun"
+local A_2 = true
+local Event = game:GetService("ReplicatedStorage").RemoteEvents.OutsideRole
+Event:FireServer(A_1, A_2)
+end)
+
+Throw.Name = "Throw"
+Throw.Parent = main
+Throw.BackgroundColor3 = Color3.fromRGB(65, 65, 65)
+Throw.BorderColor3 = Color3.fromRGB(65, 65, 65)
+Throw.Position = UDim2.new(0.213235289, 0, 0.684848487, 0)
+Throw.Size = UDim2.new(0, 77, 0, 19)
+Throw.Font = Enum.Font.SourceSans
+Throw.Text = "throw away"
+Throw.TextColor3 = Color3.fromRGB(0, 0, 0)
+Throw.TextSize = 14.000
+Throw.MouseButton1Down:connect(function()
+	while wait(1) do
+        for i,v in pairs(game:GetService("Players").LocalPlayer.Backpack:GetChildren()) do
+            if v:IsA("Tool") then
+                v.CanBeDropped = true
+            end
+        end
+    end
+end)
+
+Close.Name = "Close"
+Close.Parent = main
+Close.BackgroundColor3 = Color3.fromRGB(65, 65, 65)
+Close.BorderSizePixel = 0
+Close.Position = UDim2.new(1, 0, -0.0545454547, 0)
+Close.Size = UDim2.new(0, 32, 0, 33)
+Close.Font = Enum.Font.SourceSans
+Close.Text = "X"
+Close.TextColor3 = Color3.fromRGB(0, 0, 0)
+Close.TextSize = 14.000
+Close.MouseButton1Down:connect(function()
+OpenButton.Visible = true
+main.Visible = false
+end)
+
+OpenButton.Name = "OpenButton"
+OpenButton.Parent = ScreenGui
+OpenButton.BackgroundColor3 = Color3.fromRGB(0, 0, 0)
+OpenButton.Position = UDim2.new(0.925940275, 0, 0.886497438, 0)
+OpenButton.Size = UDim2.new(0, 54, 0, 19)
+OpenButton.Font = Enum.Font.SourceSans
+OpenButton.Text = "Open"
+OpenButton.TextColor3 = Color3.fromRGB(121, 121, 121)
+OpenButton.TextSize = 14.000
+OpenButton.MouseButton1Down:connect(function()
+main.Visible = true
+OpenButton.Visible = false
+end)
+
+--full version come soon
+end)
